@@ -15,6 +15,7 @@ const featured = [
 
 export default function HomePage() {
   const revealRefs = useRef<HTMLElement[]>([]);
+  const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -23,6 +24,21 @@ export default function HomePage() {
     );
     revealRefs.current.forEach((el) => el && observer.observe(el));
     return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const vh = window.innerHeight;
+      // Start fading at 60% through hero, fully white by 105%
+      const progress = Math.min(1, Math.max(0, (scrollY - vh * 0.6) / (vh * 0.45)));
+      if (overlayRef.current) {
+        overlayRef.current.style.opacity = String(1 - progress);
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const addRef = (el: HTMLElement | null) => {
@@ -89,153 +105,160 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── TAGLINE STRIP ── */}
-      <section
-        ref={addRef}
-        className="reveal py-20 px-6 text-center"
-      >
-        <p className="text-xs tracking-[0.35em] uppercase text-[#C9A84C] mb-4">The Work</p>
-        <h2 className="font-['Archivo',sans-serif] font-bold text-3xl sm:text-4xl md:text-5xl text-[#fafafa] max-w-3xl mx-auto leading-tight">
-          Every moment deserves to be told with purpose.
-        </h2>
-      </section>
+      {/* ── WHITE SECTIONS ── */}
+      <div className="relative bg-white">
+        {/* Scroll-reveal overlay: starts black, fades to transparent */}
+        <div
+          ref={overlayRef}
+          className="absolute inset-0 bg-[#0a0a0a] pointer-events-none z-10"
+        />
 
-      {/* ── FEATURED GRID ── */}
-      <section className="px-6 max-w-7xl mx-auto pb-24">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {featured.map((item, i) => (
-            <Link
-              key={i}
-              href={`/portfolio?category=${item.category}`}
-              ref={addRef as React.Ref<HTMLAnchorElement>}
-              className={`reveal group relative overflow-hidden cursor-pointer ${
-                i === 0 ? "sm:col-span-2 sm:row-span-2 aspect-[3/4] sm:aspect-auto sm:h-[520px]" : "aspect-[3/4]"
-              }`}
-              style={{ transitionDelay: `${i * 80}ms` }}
-            >
-              <Image
-                src={item.src}
-                alt={item.label}
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
-              <div className="absolute bottom-0 left-0 right-0 p-5 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-400">
-                <p className="text-[10px] tracking-[0.3em] uppercase text-[#C9A84C] mb-1">Album</p>
-                <p className="font-['Archivo',sans-serif] font-bold text-xl text-white tracking-wide">{item.label}</p>
-              </div>
-            </Link>
-          ))}
-        </div>
-        <div className="text-center mt-10">
-          <Link
-            href="/portfolio"
-            className="inline-flex items-center gap-2 text-sm tracking-widest uppercase text-[#C9A84C] hover:gap-4 transition-all duration-300 cursor-pointer"
-          >
-            See All Work <ArrowRight size={16} />
-          </Link>
-        </div>
-      </section>
-
-      {/* ── CATEGORIES ── */}
-      <section ref={addRef} className="reveal bg-[#0f0f0f] py-24 px-6">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-xs tracking-[0.35em] uppercase text-[#C9A84C] mb-3 text-center">Albums</p>
-          <h2 className="font-['Archivo',sans-serif] font-bold text-3xl sm:text-4xl text-[#fafafa] text-center mb-14">
-            What We Shoot
+        {/* ── TAGLINE STRIP ── */}
+        <section ref={addRef} className="reveal py-20 px-6 text-center">
+          <p className="text-xs tracking-[0.35em] uppercase text-[#C9A84C] mb-4">The Work</p>
+          <h2 className="font-['Archivo',sans-serif] font-bold text-3xl sm:text-4xl md:text-5xl text-[#0a0a0a] max-w-3xl mx-auto leading-tight">
+            Every moment deserves to be told with purpose.
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-[#27272a]">
-            {[
-              { label: "Graduation", desc: "Cap & gown portraits that celebrate your milestone", category: "graduation" },
-              { label: "Wedding", desc: "Timeless moments from your most important day", category: "wedding" },
-              { label: "Artists", desc: "Performers, musicians, and creatives on stage", category: "artists" },
-              { label: "Fashion", desc: "Editorial and lifestyle portraits with intention", category: "fashion" },
-            ].map(({ label, desc, category }) => (
+        </section>
+
+        {/* ── FEATURED GRID ── */}
+        <section className="px-6 max-w-7xl mx-auto pb-24">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {featured.map((item, i) => (
               <Link
-                key={label}
-                href={`/portfolio?category=${category}`}
-                className="group bg-[#0f0f0f] p-8 hover:bg-[#1a1a1a] transition-colors duration-300 cursor-pointer"
+                key={i}
+                href={`/portfolio?category=${item.category}`}
+                ref={addRef as React.Ref<HTMLAnchorElement>}
+                className={`reveal group relative overflow-hidden cursor-pointer ${
+                  i === 0 ? "sm:col-span-2 sm:row-span-2 aspect-[3/4] sm:aspect-auto sm:h-[520px]" : "aspect-[3/4]"
+                }`}
+                style={{ transitionDelay: `${i * 80}ms` }}
               >
-                <div className="w-8 h-px bg-[#C9A84C] mb-5 group-hover:w-14 transition-all duration-300" />
-                <p className="font-['Archivo',sans-serif] font-bold text-lg text-[#fafafa] mb-2">{label}</p>
-                <p className="text-sm text-[#71717a] leading-relaxed">{desc}</p>
-                <p className="mt-5 text-xs tracking-widest uppercase text-[#C9A84C] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  View Album →
-                </p>
+                <Image
+                  src={item.src}
+                  alt={item.label}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
+                <div className="absolute bottom-0 left-0 right-0 p-5 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-400">
+                  <p className="text-[10px] tracking-[0.3em] uppercase text-[#C9A84C] mb-1">Album</p>
+                  <p className="font-['Archivo',sans-serif] font-bold text-xl text-white tracking-wide">{item.label}</p>
+                </div>
               </Link>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* ── OWNER SPOTLIGHT ── */}
-      <section ref={addRef} className="reveal py-24 px-6">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-          <div className="relative aspect-[3/4] max-w-sm mx-auto md:mx-0">
-            <Image
-              src="/images/owner/clement.jpg"
-              alt="Clement Akuamoh-Boateng — Edit_ByClem"
-              fill
-              className="object-cover grayscale"
-              style={{ objectPosition: "50% 15%" }}
-            />
-            <div className="absolute -bottom-4 -right-4 w-full h-full border border-[#C9A84C]/30 -z-10" />
+          <div className="text-center mt-10">
+            <Link
+              href="/portfolio"
+              className="inline-flex items-center gap-2 text-sm tracking-widest uppercase text-[#C9A84C] hover:gap-4 transition-all duration-300 cursor-pointer"
+            >
+              See All Work <ArrowRight size={16} />
+            </Link>
           </div>
-          <div>
-            <p className="text-xs tracking-[0.35em] uppercase text-[#C9A84C] mb-4">Behind the Lens</p>
-            <h2 className="font-['Archivo',sans-serif] font-black text-4xl sm:text-5xl text-[#fafafa] uppercase leading-none mb-6">
-              Clement<br />Akuamoh-<br />Boateng
+        </section>
+
+        {/* ── CATEGORIES ── */}
+        <section ref={addRef} className="reveal bg-[#f4f4f5] py-24 px-6">
+          <div className="max-w-5xl mx-auto">
+            <p className="text-xs tracking-[0.35em] uppercase text-[#C9A84C] mb-3 text-center">Albums</p>
+            <h2 className="font-['Archivo',sans-serif] font-bold text-3xl sm:text-4xl text-[#0a0a0a] text-center mb-14">
+              What We Shoot
             </h2>
-            <p className="text-[#a1a1aa] text-base leading-relaxed mb-8 max-w-md">
-              A photographer with an eye for the in-between moments — the raw, the real, and the beautiful. From graduation stages to wedding aisles, every session is a story waiting to be told.
-            </p>
-            <div className="flex flex-col gap-3 mb-8">
-              <div className="flex items-center gap-3">
-                <div className="w-1 h-1 rounded-full bg-[#C9A84C]" />
-                <span className="text-sm text-[#a1a1aa]">New Jersey–based photographer</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-1 h-1 rounded-full bg-[#C9A84C]" />
-                <span className="text-sm text-[#a1a1aa]">Graduation · Wedding · Artists · Fashion</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-1 h-1 rounded-full bg-[#C9A84C]" />
-                <span className="text-sm text-[#a1a1aa]">Available for booking year-round</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-5">
-              <Link
-                href="/about"
-                className="inline-flex items-center gap-2 border border-[#C9A84C] text-[#C9A84C] px-6 py-2.5 text-xs tracking-widest uppercase hover:bg-[#C9A84C] hover:text-[#0a0a0a] transition-all duration-300 cursor-pointer"
-              >
-                Full Story
-              </Link>
-              <a
-                href="https://www.instagram.com/edit_byclem"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 text-sm text-[#a1a1aa] hover:text-[#C9A84C] transition-colors cursor-pointer"
-              >
-                <InstagramIcon size={17} /> @edit_byclem
-              </a>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-[#d4d4d8]">
+              {[
+                { label: "Graduation", desc: "Cap & gown portraits that celebrate your milestone", category: "graduation" },
+                { label: "Wedding", desc: "Timeless moments from your most important day", category: "wedding" },
+                { label: "Artists", desc: "Performers, musicians, and creatives on stage", category: "artists" },
+                { label: "Fashion", desc: "Editorial and lifestyle portraits with intention", category: "fashion" },
+              ].map(({ label, desc, category }) => (
+                <Link
+                  key={label}
+                  href={`/portfolio?category=${category}`}
+                  className="group bg-[#f4f4f5] p-8 hover:bg-white transition-colors duration-300 cursor-pointer"
+                >
+                  <div className="w-8 h-px bg-[#C9A84C] mb-5 group-hover:w-14 transition-all duration-300" />
+                  <p className="font-['Archivo',sans-serif] font-bold text-lg text-[#0a0a0a] mb-2">{label}</p>
+                  <p className="text-sm text-[#71717a] leading-relaxed">{desc}</p>
+                  <p className="mt-5 text-xs tracking-widest uppercase text-[#C9A84C] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    View Album →
+                  </p>
+                </Link>
+              ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ── CTA BANNER ── */}
-      <section ref={addRef} className="reveal bg-[#C9A84C] py-20 px-6 text-center">
-        <p className="text-[#0a0a0a]/60 text-xs tracking-[0.35em] uppercase mb-3">Let&apos;s create together</p>
-        <h2 className="font-['Archivo',sans-serif] font-black text-4xl sm:text-5xl text-[#0a0a0a] uppercase mb-8">
-          Ready to book your session?
-        </h2>
-        <Link
-          href="/contact"
-          className="inline-flex items-center gap-2 bg-[#0a0a0a] text-[#fafafa] px-10 py-4 text-sm font-semibold tracking-widest uppercase hover:bg-[#1a1a1a] transition-colors duration-300 cursor-pointer"
-        >
-          Get in Touch <ArrowRight size={16} />
-        </Link>
-      </section>
+        {/* ── OWNER SPOTLIGHT ── */}
+        <section ref={addRef} className="reveal py-24 px-6 bg-white">
+          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+            <div className="relative aspect-[3/4] max-w-sm mx-auto md:mx-0">
+              <Image
+                src="/images/owner/clement.jpg"
+                alt="Clement Akuamoh-Boateng — Edit_ByClem"
+                fill
+                className="object-cover grayscale"
+                style={{ objectPosition: "50% 15%" }}
+              />
+              <div className="absolute -bottom-4 -right-4 w-full h-full border border-[#C9A84C]/30 -z-10" />
+            </div>
+            <div>
+              <p className="text-xs tracking-[0.35em] uppercase text-[#C9A84C] mb-4">Behind the Lens</p>
+              <h2 className="font-['Archivo',sans-serif] font-black text-4xl sm:text-5xl text-[#0a0a0a] uppercase leading-none mb-6">
+                Clement<br />Akuamoh-<br />Boateng
+              </h2>
+              <p className="text-[#52525b] text-base leading-relaxed mb-8 max-w-md">
+                A photographer with an eye for the in-between moments — the raw, the real, and the beautiful. From graduation stages to wedding aisles, every session is a story waiting to be told.
+              </p>
+              <div className="flex flex-col gap-3 mb-8">
+                <div className="flex items-center gap-3">
+                  <div className="w-1 h-1 rounded-full bg-[#C9A84C]" />
+                  <span className="text-sm text-[#52525b]">New Jersey–based photographer</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-1 h-1 rounded-full bg-[#C9A84C]" />
+                  <span className="text-sm text-[#52525b]">Graduation · Wedding · Artists · Fashion</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-1 h-1 rounded-full bg-[#C9A84C]" />
+                  <span className="text-sm text-[#52525b]">Available for booking year-round</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-5">
+                <Link
+                  href="/about"
+                  className="inline-flex items-center gap-2 border border-[#C9A84C] text-[#C9A84C] px-6 py-2.5 text-xs tracking-widest uppercase hover:bg-[#C9A84C] hover:text-[#0a0a0a] transition-all duration-300 cursor-pointer"
+                >
+                  Full Story
+                </Link>
+                <a
+                  href="https://www.instagram.com/edit_byclem"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-[#52525b] hover:text-[#C9A84C] transition-colors cursor-pointer"
+                >
+                  <InstagramIcon size={17} /> @edit_byclem
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── CTA BANNER ── */}
+        <section ref={addRef} className="reveal bg-[#C9A84C] py-20 px-6 text-center">
+          <p className="text-[#0a0a0a]/60 text-xs tracking-[0.35em] uppercase mb-3">Let&apos;s create together</p>
+          <h2 className="font-['Archivo',sans-serif] font-black text-4xl sm:text-5xl text-[#0a0a0a] uppercase mb-8">
+            Ready to book your session?
+          </h2>
+          <Link
+            href="/contact"
+            className="inline-flex items-center gap-2 bg-[#0a0a0a] text-[#fafafa] px-10 py-4 text-sm font-semibold tracking-widest uppercase hover:bg-[#1a1a1a] transition-colors duration-300 cursor-pointer"
+          >
+            Get in Touch <ArrowRight size={16} />
+          </Link>
+        </section>
+
+      </div>{/* end white sections */}
     </>
   );
 }
