@@ -14,6 +14,15 @@ const photos: { src: string; alt: string; category: Exclude<Category, "all"> }[]
   { src: "/images/graduation/grad-3.jpg", alt: "Graduation celebration", category: "graduation" },
   { src: "/images/artists/artist-1.jpg", alt: "Artist performing on stage", category: "artists" },
   { src: "/images/fashion/fashion-1.jpg", alt: "Fashion editorial portrait", category: "fashion" },
+  { src: "/images/fashion/fashion-2.jpg", alt: "Runway — crochet and pink", category: "fashion" },
+  { src: "/images/fashion/fashion-3.jpg", alt: "Runway — brown crochet shirt", category: "fashion" },
+  { src: "/images/fashion/fashion-4.jpg", alt: "Runway — brown crochet portrait", category: "fashion" },
+  { src: "/images/fashion/fashion-5.jpg", alt: "Runway — green African dress", category: "fashion" },
+  { src: "/images/fashion/fashion-6.jpg", alt: "Runway — African print jumpsuit", category: "fashion" },
+  { src: "/images/fashion/fashion-7.jpg", alt: "Runway — dashiki print dress", category: "fashion" },
+  { src: "/images/fashion/fashion-8.jpg", alt: "Cultural fashion — red and black", category: "fashion" },
+  { src: "/images/fashion/fashion-9.jpg", alt: "Cultural fashion — group portrait", category: "fashion" },
+  { src: "/images/fashion/fashion-10.jpg", alt: "Cultural fashion — couple portrait", category: "fashion" },
 ];
 
 const videos: { src: string; poster?: string; label: string }[] = [
