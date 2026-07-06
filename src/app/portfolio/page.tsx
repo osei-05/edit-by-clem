@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { Play, X, ExternalLink } from "lucide-react";
 import Lightbox from "@/components/Lightbox";
 
-type Category = "all" | "graduation" | "wedding" | "artists" | "fashion";
+type Category = "all" | "graduation" | "wedding" | "artists" | "fashion" | "events";
 
 const photos: { src: string; alt: string; category: Exclude<Category, "all"> }[] = [
   { src: "/images/graduation/grad-1.jpg", alt: "Graduation portrait 2025", category: "graduation" },
@@ -20,9 +20,9 @@ const photos: { src: string; alt: string; category: Exclude<Category, "all"> }[]
   { src: "/images/fashion/fashion-5.jpg", alt: "Runway — green African dress", category: "fashion" },
   { src: "/images/fashion/fashion-6.jpg", alt: "Runway — African print jumpsuit", category: "fashion" },
   { src: "/images/fashion/fashion-7.jpg", alt: "Runway — dashiki print dress", category: "fashion" },
-  { src: "/images/fashion/fashion-8.jpg", alt: "Cultural fashion — red and black", category: "fashion" },
-  { src: "/images/fashion/fashion-9.jpg", alt: "Cultural fashion — group portrait", category: "fashion" },
-  { src: "/images/fashion/fashion-10.jpg", alt: "Cultural fashion — couple portrait", category: "fashion" },
+  { src: "/images/fashion/fashion-8.jpg", alt: "Cultural event — red and black", category: "events" },
+  { src: "/images/fashion/fashion-9.jpg", alt: "Cultural event — group portrait", category: "events" },
+  { src: "/images/fashion/fashion-10.jpg", alt: "Cultural event — couple portrait", category: "events" },
 ];
 
 const videos: { src: string; poster?: string; label: string }[] = [
@@ -37,6 +37,7 @@ const categories: { id: Category; label: string }[] = [
   { id: "wedding", label: "Wedding" },
   { id: "artists", label: "Artists" },
   { id: "fashion", label: "Fashion" },
+  { id: "events", label: "Events" },
 ];
 
 function PortfolioContent() {
@@ -67,8 +68,10 @@ function PortfolioContent() {
     if (el && !revealRefs.current.includes(el)) revealRefs.current.push(el);
   };
 
-  const filtered = active === "all" || active === "wedding"
-    ? active === "wedding" ? [] : photos
+  const filtered = active === "wedding"
+    ? []
+    : active === "all"
+    ? photos
     : photos.filter((p) => p.category === active);
 
   const showVideos = active === "all" || active === "wedding";
